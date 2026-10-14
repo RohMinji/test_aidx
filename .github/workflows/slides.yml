@@ -1,0 +1,21 @@
+# slides/ 에 이미지를 올리면 표출 순서 목록(list.json)을 자동으로 다시 만들어요
+name: slides list
+on:
+  push:
+    branches: [main]
+    paths: ["slides/**"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/build_slides.py
+      - name: commit list.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add -A slides
+          git diff --cached --quiet || (git commit -m "Update slides list" && git push)
